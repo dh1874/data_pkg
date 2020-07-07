@@ -3,11 +3,9 @@
 # @Date    : 2020-05-25
 # @Author  : HD
 import math
-import pandas as pd
-import numpy as np
 
 from analysis_evaluate.discretization.cut_off_process import *
-from utils.constants import *
+from constants import *
 from utils.example_data import ExampleData
 
 

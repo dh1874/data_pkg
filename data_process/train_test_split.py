@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 
 class TrainTestSplit(object):
 	"""
-	构造训练测试集plot.py
+	构造训练测试集
 	"""
 
 	def __init__(self, trainData, yname, is_test_size=None):
@@ -28,29 +28,29 @@ class TrainTestSplit(object):
 		self.test = None
 
 	def set_overSample_smoteOdds(self):
-		'''smote包的过抽样'''
+		"""smote包的过抽样"""
 
 	def set_overSample_copyOdds(self, input):
-		'''y=1樣本複製次數'''
+		"""y=1樣本複製次數"""
 		self.copy_odds = input
 		return self
 
 	def set_underSample_odds(self, input):
-		'''y=0样本之于y=1样本的倍数'''
+		"""y=0样本之于y=1样本的倍数"""
 		self.under_odds = input
 		return self
 
 	# 按配置的實際數值，執行训练测试集生成的預處理
 	@property
 	def trainTestPreProcess_(self):
-		'''訓練測試集的抽樣預處理
+		"""訓練測試集的抽樣預處理
 
 		return：
 		——————————
 		self.trian
 		self.test
 
-		'''
+		"""
 		print("[HD_Pre] start data preProcess")
 		print("[HD_Pre] start TrainData nums_1 : nums_0 = %s : %s " % (self.nums_1, self.nums_0))
 

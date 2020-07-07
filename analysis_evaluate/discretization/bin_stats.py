@@ -3,11 +3,9 @@
 # @Date    : 2020-05-25
 # @Author  : HD
 import math
-import pandas as pd
-import numpy as np
 
 from analysis_evaluate.discretization.cut_off_process import *
-from utils.constants import *
+from constants import *
 from utils.example_data import ExampleData
 
 
@@ -106,7 +104,7 @@ class BinStats(object):
         计算基础的分箱统计指标
 
         :param data_series:
-        :return: pd.series
+        :return: pd.series ：key = {FEATURE，CNT，PSTV_CNT， NGTV_CNT， PRED_CNT， HIT_CNT}
         """
 
         rst_dict = {}
@@ -145,8 +143,8 @@ class BinStats(object):
         """
         计算分箱各组的统计指标
 
-        :param res:
-        :return: {TPR, FPR}
+        :param res: pd.Series key = {FEATURE，CNT，PSTV_CNT， NGTV_CNT， PRED_CNT， HIT_CNT}
+        :return: pd.Series [FEATURE, CNT, PSTV_CNT, NGTV_CNT, PRED_CNT, HIT_CNT, PRECISION, PCT, TPR, FPR, PSTV_RATE, ODDS, LN_ODDS, WOE, IV, TOTAL_IV]
         """
 
         if self.col_pred_name:
@@ -223,7 +221,7 @@ class BinStats(object):
 
             cut_offs = sorted(cut_offs, reverse=True)
 
-            # Na值填充 -1
+            # Na值填充 - 1
             self.df[self.col_group_name] = self.df[col_feature_name].apply(self.split_value_2box_by_cum_descending,
                                                                            args=(cut_offs,)).fillna(-1)
 
@@ -347,6 +345,7 @@ class BinStats(object):
 
             """
             . 最大最小值校验
+            . 保证输入数组的极大为feature.max，极小最小为feature.min
             """
             if min(cut_offs) < self.df[feature_name].min():
 
@@ -368,7 +367,9 @@ class BinStats(object):
             percentile_list = [self.df[self.df[feature_name] <= i]['rank'].max() for i in cut_offs]
 
         else:
-
+            """
+            默认十分位【10%, 20%, ..., 100%】
+            """
             percentile_list = percentile_list if percentile_list else [i / 10.0 for i in range(1, 11)]
 
             bbp.percentile_point = percentile_list
@@ -390,14 +391,18 @@ class BinStats(object):
             # 该分组的范围列
             res_dict.setdefault(RANGE_COL, [0.0]).append('>=%s' % point)
 
+            # 计算该分组的基础分箱统计指标，转换为字典形式{}
             dict_seg = self.calc_base_stats_indicator(df_seg).to_dict()
 
+            # 转换为{key: [v1, ..., vn]}
             for k, v in dict_seg.items():
 
                 res_dict.setdefault(k, [0.0]).append(v)
 
+        # 转换为data_frame数据结构
         res = pd.DataFrame(res_dict)
 
+        # 计算得到， 完整的分箱统计结果
         self.__bin_stats_result_df = self.calc_bin_stats(res)
 
     def bin_stats_by_cum_ascd(self, feature_name, percentile_list=None, cut_offs=None):
@@ -441,6 +446,7 @@ class BinStats(object):
             percentile_list = [self.df[self.df[feature_name] <= i]['rank'].min() for i in cut_offs]
 
         # 按TopN%折算
+        # 默认 【10%, 20%, ..., 100%】
         else:
 
             percentile_list = percentile_list if percentile_list else [i / 10.0 for i in range(1, 11)]
@@ -449,6 +455,7 @@ class BinStats(object):
 
             bbp.set_max_switch()
 
+            # 输入百分位数，得到切分点的值，按<=max的形式
             cut_offs = bbp.calc(self.df, feature_name)
 
             # 从大到最小值
@@ -464,15 +471,57 @@ class BinStats(object):
             # 该分组的范围列
             res_dict.setdefault(RANGE_COL, [0.0]).append('<=%s' % point)
 
+            # 计算该分组的基础分箱统计指标，转换为字典形式{}
             dict_seg = self.calc_base_stats_indicator(df_seg).to_dict()
 
+            # 转换为{key: [v1, ..., vn]}
             for k, v in dict_seg.items():
 
                 res_dict.setdefault(k, [0.0]).append(v)
 
         res = pd.DataFrame(res_dict)
 
+        # 计算得到， 完整的分箱统计结果
         self.__bin_stats_result_df = self.calc_bin_stats(res)
+
+    def labeled_for_feature_by_group(self, label_col_name, feature_name, cut_offs):
+        """
+        对指定特征列，用指定的切分点集合，按分组分箱的方式，打标签
+
+        :param label_col_name:
+        :param feature_name:
+        :param cut_offs:
+        :return:
+        """
+
+        self.df[label_col_name] = self.df[feature_name].apply(self.split_value_2box_by_group,
+                                                                args=(cut_offs,))
+
+    def labeled_for_feature_by_accum_desc(self, label_col_name, feature_name, cut_offs):
+        """
+        对指定特征列，用指定的切分点集合，按降序累计的分箱方式，打标签
+
+        :param label_col_name:
+        :param feature_name:
+        :param cut_offs:
+        :return:
+        """
+
+        self.df[label_col_name] = self.df[feature_name].apply(self.split_value_2box_by_cum_descending,
+                                                                args=(cut_offs,))
+
+    def labeled_for_feature_by_accum_ascd(self, label_col_name, feature_name, cut_offs):
+        """
+        对指定特征列，用指定的切分点集合，按升序累计的分箱方式，打标签
+
+        :param label_col_name:
+        :param feature_name:
+        :param cut_offs:
+        :return:
+        """
+
+        self.df[label_col_name] = self.df[feature_name].apply(self.split_value_2box_by_cum_ascending,
+                                                                args=(cut_offs,))
 
     def bin_stats_by_group(self, feature_name, cut_offs):
         """
@@ -494,7 +543,7 @@ class BinStats(object):
         # 计算分箱统计指标
         res = self.calc_bin_stats(res)
 
-        # 重置index， 让df扁平
+        # 重置index，让df扁平
         res.reset_index(inplace=True)
 
         # 第一列的名称，’group' -> RANGE_COL
@@ -516,7 +565,7 @@ class BinStats(object):
         # 分组分箱
         self.__is_group_bin = True
 
-        # 跳出标记
+        # 是否单调。 跳出while循环的标记
         monotonic_ok = False
 
         cut_off_strategy.max_bin = init_max_bin
@@ -547,6 +596,23 @@ class BinStats(object):
 
             print(self.get_bin_stats_result_[[RANGE_COL, CNT_COL, PSTV_RATE_COL]])
 
+    def bin_error_(self):
+
+        P = 0.05
+
+        # 获取一列数得Q1
+        get_quantile_25 = lambda x: x.quantile(P)
+
+        # 获取一列数得Q3
+        get_quantile_75 = lambda x: x.quantile(1 - P)
+
+        # 匿名函数重命名
+        get_quantile_25.__name__ = 'quantile_25'
+
+        get_quantile_75.__name__ = 'quantile_75'
+
+        self.df.groupby(self.label_name)[['f1', 'f2']].agg({'f1': 'mean', 'f2': [get_quantile_25, get_quantile_75]})
+
 
 if __name__ == '__main__':
 
@@ -557,6 +623,8 @@ if __name__ == '__main__':
     print(df.head())
 
     be = BinStats(df, 'y')
+
+    df['grp'] = be.split_value_2box_by_group(1, [4,5,6,7])
 
     # 卡方切分策略
     chi2_strategy = Chi2Binning('y')
@@ -574,7 +642,7 @@ if __name__ == '__main__':
 
     # be.bin_stats_by_group('sepal_width', ef_strategy.calc(df, 'sepal_width'))
 
-    # be.bin_stats_by_monotone_test('sepal_width', ef_strategy)
+    be.bin_stats_by_monotone_test('sepal_width', ef_strategy)
 
     # be.bin_stats_by_cum_desc('sepal_width', cut_offs=[1.9, 3.2, 8])
 

@@ -3,22 +3,17 @@
 # @Date    : 2018-07-04 22:52:37
 # @Author  : HD
 
-from os import path
 import numpy as np
 import matplotlib as mpl
-import jieba
-from wordcloud import *
 import sys
-import PIL.Image as Image
 # from scipy.misc import imread
 from scipy.interpolate import spline
-from utils.configuration import *
+from configuration import *
 if IS_LINUX:
     print('[plotHD] initial fig_path = %s ' % FIGURE_FILE_PHAT)
     print('[plotHD] setEnv = LINUX')
     mpl.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import axes
 import seaborn as sns
 import pandas as pd
 
@@ -92,7 +87,7 @@ class MyPlot(object):
 
     def __init_figure_params(self, ax):
         """
-        初始化图片参数
+        加载图片参数
 
         :return:
         """
@@ -144,6 +139,7 @@ class MyPlot(object):
 
     def plot_by_xy(self, x_list, y_list):
 
+        # 初始化，画布
         fig, ax = plt.subplots()
 
         # 曲线平滑处理
@@ -155,7 +151,7 @@ class MyPlot(object):
 
         ax.yaxis.grid(True)
 
-        # 初始化图片参数
+        # 加载图片参数
         self.__init_figure_params(ax)
 
         # 展示，或者保存
@@ -205,8 +201,8 @@ class MyPlot(object):
 
         多模型的RUC曲线对比
 
-        :param x_dict： {key: [value]}
-        :param y_dict： {key: [value]}
+        :param x_dict：{key: [value]}
+        :param y_dict：{key: [value]}
         :return:
         """
 

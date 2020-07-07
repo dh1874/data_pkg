@@ -9,13 +9,19 @@ from sqlalchemy import create_engine
 
 
 class MySqlUtils(object):
-    """数据库操作"""
+    """数据库操作 BY pandas"""
 
-    def __init__(self, user, password, host, port, db):
+    def __init__(self, user, password, host, port, db, is_oracle=False):
         super(MySqlUtils, self).__init__()
 
         self.engine_str = 'mysql+pymysql://%s:%s@%s:%d/%s?charset=utf8' \
                           % (user, password, host, port, db)
+
+        if is_oracle:
+
+            # db: service_name.
+            self.engine_str = 'oracle+cx_oracle://%s:%s@%s:%d/?service_name=%s' \
+                              % (user, password, host, port, db)
 
         self.conn: sqlalchemy.engine.base.Engine = create_engine(self.engine_str,
                                                                  encoding='utf-8')
@@ -43,10 +49,15 @@ class MySqlUtils(object):
         """
         写入数据库, 追加
         """
-        pd.DataFrame.to_sql(df, name=tbl_name, con=self.conn,
-                            if_exists='append', index=False)
+        pd.DataFrame.to_sql(df, name=tbl_name, con=self.conn, if_exists='append', index=False)
 
 
 if __name__ == '__main__':
 
-    pass
+    # user =
+    # password =
+    # host =
+    # port =
+    # db =
+
+    # ms = MySqlUtils(user, password, host, port, db, is_oracle=True)

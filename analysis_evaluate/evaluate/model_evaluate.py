@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.metrics import classification_report, roc_auc_score
 
 from analysis_evaluate.discretization.bin_stats import BinStats
-from utils.constants import *
+from constants import *
 from analysis_evaluate.evaluate.base_evaluate import BaseEvaluate
 
 
