@@ -35,7 +35,7 @@ class Reorder(object):
 class Smt(object):
 
 	last_v = 0
-	last_v_list = [1,2,3]
+	last_v_list = [1, 2, 3]
 
 	def __init__(self, v):
 
@@ -49,14 +49,15 @@ class MyRedis(object):
 	def __init__(self):
 		# 主数据库别名（根据自己爱好设置的，叫狗蛋也挺好）
 		service_name = 'mymaster'
+
 		#
 		sentinel = ([('192.168.1.32', 19111),
 					 ('192.168.1.32', 19112),
 		             ('192.168.1.32', 19113)])
 
 		sentinel = Sentinel([('192.168.1.32', 19111),
-							 ('192.168.1.32', 19112),
-				             ('192.168.1.32', 19113)],
+		                     ('192.168.1.32', 19112),
+		                     ('192.168.1.32', 19113)],
 		                     socket_timeout=0.1)
 
 		# rc = Sentinel(sentinel)
@@ -65,8 +66,8 @@ class MyRedis(object):
 		print(sentinel.discover_slaves(service_name))
 
 		# # 通过哨兵获取redis主从
-		self.redis_master = sentinel.master_for(service_name=service_name,password=123456)
-		self.redis_slave = sentinel.slave_for(service_name=service_name,password=123456)
+		self.redis_master = sentinel.master_for(service_name=service_name, password=123456)
+		self.redis_slave = sentinel.slave_for(service_name=service_name, password=123456)
 
 		# master = rc.discover_master(service_name)
 
@@ -100,14 +101,14 @@ if __name__ == '__main__':
 	print(mr.redis_slave.get('aaaaaaa'))
 
 	# mr.redis_master.set('s1_p', s1_pickle)
-	#
+
 	# res = mr.redis_slave.get('s2_p')
-	#
+
 	# print(res is None)
-	#
+
 	# s11 = pickle.loads(mr.redis_slave.get('s1_p', password=123456))
-	#
+
 	# print(s11.last_v_list)
-	#
+
 	# # mr.redis_master.
 
