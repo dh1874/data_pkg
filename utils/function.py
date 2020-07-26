@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Date    : 2020-06-10
 # @Author  : HD
+import collections
 
 
 def find_the_key_of_min_value_in_dict(the_dict):
@@ -13,6 +14,37 @@ def find_the_key_of_min_value_in_dict(the_dict):
     """
 
     return min(the_dict, key=the_dict.get)
+
+def count_list_1(alist):
+    """
+    计数
+    
+    :param alist: list
+    :return dict{v: cnt}
+    """
+
+    return collections.Counter(alist)
+
+def count_list_1(alist):
+    """
+    计数
+    
+    :param alist: list
+    :return dict{v: cnt}
+    """
+
+    res_dict = {}
+
+    for i in alist:
+
+        res_dict = res_dict.get(i, 0) += 1
+
+
+def sorted_dict_by_value(the_dict):
+
+    return sorted(dicts.items(), key=lambda item:item[1], reverse=True)
+
+
 
 
 def division():
@@ -28,4 +60,6 @@ def division():
 
 if __name__ == '__main__':
 
-    print(division())
+    dicts = count_list([1,1,1,3,3,3,3,2])
+    # sorted(dic.items(), key=lambda item:item[1], reverse=True)
+    print(sorted_dict_by_value(dicts))
