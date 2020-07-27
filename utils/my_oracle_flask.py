@@ -45,7 +45,6 @@ db.session.commit()
 if __name__ == '__main__':
 
 	#app.run()
-
 	user = 'pca'
 	password = '1234'
 	host = '192.168.1.29'
